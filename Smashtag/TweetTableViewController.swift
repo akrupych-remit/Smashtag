@@ -33,6 +33,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
                     if (self?.request == request) {
                         self?.tweets.insert(newTweets, at: 0)
                         self?.tableView.insertSections([0], with: .fade)
+                        self?.refreshControl?.endRefreshing()
                     }
                 }
             }
@@ -41,7 +42,7 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
     
     private func twitterRequest() -> Twitter.Request? {
         if let query = searchText, !query.isEmpty {
-            return Twitter.Request(search: query, count: 100)
+            return Twitter.Request(search: "\(query) -filter:safe -filter:retweets", count: 100)
         }
         return nil
     }
@@ -57,6 +58,10 @@ class TweetTableViewController: UITableViewController, UITextFieldDelegate {
         searchText = textField.text
         textField.resignFirstResponder()
         return true
+    }
+    
+    @IBAction func pulledToRefresh(_ sender: UIRefreshControl) {
+        searchForTweets()
     }
 
     // MARK: - Table view data source
